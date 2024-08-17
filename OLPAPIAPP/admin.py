@@ -1,0 +1,10 @@
+from django.contrib import admin
+from UserControl.models import *
+from .models import *
+# Register your models here.
+
+
+admin.site.register(CustomUserModel)
+admin.site.register(CourseModel)
+admin.site.register(EnrollmentModel)
+admin.site.register(LessonModel)
