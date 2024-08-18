@@ -20,10 +20,10 @@ class UserRegistraion(APIView):
     def get(self,request):
         users=CustomUserModel.objects.all()
         ser=CustomUserSerializer(users,many=True)
-        new=ser.data[0]
-        print(new)
-        for key , value in new.items():
-            print(f'{key}={value}')
+        # new=ser.data[0]
+        # print(new)
+        # for key , value in new.items():
+        #     print(f'{key}={value}')
         return Response(ser.data)
         
     def post(self,request):
