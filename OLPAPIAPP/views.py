@@ -51,3 +51,83 @@ class CourseDetailView(APIView):
         course=get_object_or_404(CourseModel,id=course_id)
         course.delete()
         return Response({'message':'Item Deleted Successfully!'})
+
+
+class EnrollmentCreateView(APIView):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    
+    def get(self,request):
+        enrollments=EnrollmentModel.objects.all()
+        ser=EnrollmentModelSerializer(enrollments,many=True)
+        return Response(ser.data)
+    def post(self,request,course_id):
+        course=get_object_or_404(CourseModel,id=course_id)
+        data={'user':self.request.user.id,'course':course.pk}
+        ser=EnrollmentModelSerializer(data=data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data)
+        return Response(ser.errors)
+    
+class EnrollmentDetailView(APIView):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    
+    def get(self,request,enrollment_id):
+        enl=get_object_or_404(EnrollmentModel,id=enrollment_id)
+        ser=EnrollmentModelSerializer(enl)
+        return Response(ser.data)
+    
+    def delete(self,request,enrollment_id):
+        enl=get_object_or_404(EnrollmentModel,id=enrollment_id)
+        enl.delete()
+        return Response({'message':'Item Deleted Successfully!'})
+    
+
+class LessonDetailCrudView(APIView):
+    
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    
+    def get(self,request,lesson_id):
+    
+        lesson=get_object_or_404(LessonModel,id=lesson_id)
+        ser=LessonModelSerializer(lesson)
+        return Response(ser.data)
+    
+    def post(self,request):
+        
+        ser=LessonModelSerializer(data=request.data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data)
+        return Response(ser.errors)
+    
+    def put(self,request,lesson_id):
+        
+        lesson=get_object_or_404(LessonModel,id=lesson_id)
+        ser=LessonModelSerializer(instance=lesson,data=request.data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data)
+        return Response(ser.errors)
+    
+    def delete(self,request,lesson_id):
+    
+        lesson=get_object_or_404(LessonModel,id=lesson_id)
+        lesson.delete()
+        return Response({'message':'Item Deleted Successfully!'})
+    
+class Get_All_Lesson_Via_Course(APIView):
+    
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+        
+    def get(self,request,course_id):
+        lessons=LessonModel.objects.filter(course=course_id)
+        ser=LessonModelSerializer(lessons,many=True)
+        return Response(ser.data)
+    
+    
+    
