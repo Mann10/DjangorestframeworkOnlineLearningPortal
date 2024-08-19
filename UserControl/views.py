@@ -1,8 +1,10 @@
+import uuid
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
 from .models import *
 from .serializers import *
-import uuid
+from OLPAPIAPP.custom_permission import *
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -68,6 +70,7 @@ class UserProfile(APIView):
         
     def put(self,request):
         user_id=self.request.user.id
+        print(user_id)
         try:
             user_details=CustomUserModel.objects.get(id=user_id)
         except CustomUserModel.DoesNotExist:

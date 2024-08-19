@@ -9,11 +9,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
+from .custom_permission import *
 # Create your views here.
 
 class CourseCreateView(APIView):
     authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,(IsStudentAndReadOnlyCourses|IsIntructorCanCreateUpdateDestroyCourse|IsAdmin)]
+    
     
     def get(self,request):
         courses=CourseModel.objects.all().order_by('-created_at')
@@ -22,14 +24,13 @@ class CourseCreateView(APIView):
     def post(self,request):
         ser=CourseModelSerializer(data=request.data)
         if ser.is_valid():
-            print(ser.validated_data['title'])
             ser.save()
             return Response(ser.data)
         return Response(ser.errors)
     
 class CourseDetailView(APIView):
     authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,(IsStudentAndReadOnlyCourses|IsIntructorCanCreateUpdateDestroyCourse|IsAdmin)]
     
     def get(self,request,course_id):
         course=get_object_or_404(CourseModel,id=course_id)
@@ -40,6 +41,7 @@ class CourseDetailView(APIView):
     
     def put(self,request,course_id):
         course=get_object_or_404(CourseModel,id=course_id)
+        self.check_object_permissions(request,course)
         ser=CourseUpdateSerializer(instance=course,data=request.data)
         if ser.is_valid():
             ser.save()
@@ -49,13 +51,14 @@ class CourseDetailView(APIView):
         
     def delete(self,request,course_id):
         course=get_object_or_404(CourseModel,id=course_id)
+        self.check_object_permissions(request,course)
         course.delete()
         return Response({'message':'Item Deleted Successfully!'})
 
 
 class EnrollmentCreateView(APIView):
     authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,IsStudentCanManageOwnEnrollement|IsAdmin]
     
     def get(self,request):
         enrollments=EnrollmentModel.objects.all()
@@ -72,15 +75,17 @@ class EnrollmentCreateView(APIView):
     
 class EnrollmentDetailView(APIView):
     authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,IsStudentCanManageOwnEnrollement|IsAdmin]
     
     def get(self,request,enrollment_id):
         enl=get_object_or_404(EnrollmentModel,id=enrollment_id)
+        self.check_object_permissions(request, enl)
         ser=EnrollmentModelSerializer(enl)
         return Response(ser.data)
     
     def delete(self,request,enrollment_id):
         enl=get_object_or_404(EnrollmentModel,id=enrollment_id)
+        self.check_object_permissions(request, enl)
         enl.delete()
         return Response({'message':'Item Deleted Successfully!'})
     
@@ -88,7 +93,7 @@ class EnrollmentDetailView(APIView):
 class LessonDetailCrudView(APIView):
     
     authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,(IsStudentAndReadOnlyCourses|IsInstructorCreateupdatedeletelessons|IsAdmin)]
     
     def get(self,request,lesson_id):
     
@@ -97,7 +102,7 @@ class LessonDetailCrudView(APIView):
         return Response(ser.data)
     
     def post(self,request):
-        
+        self.check_object_permissions(request,request.data)
         ser=LessonModelSerializer(data=request.data)
         if ser.is_valid():
             ser.save()
@@ -122,7 +127,7 @@ class LessonDetailCrudView(APIView):
 class Get_All_Lesson_Via_Course(APIView):
     
     authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,(IsStudentCanManageOwnEnrollement|IsInstructorCreateupdatedeletelessons|IsAdmin)]
         
     def get(self,request,course_id):
         lessons=LessonModel.objects.filter(course=course_id)

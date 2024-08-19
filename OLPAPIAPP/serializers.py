@@ -23,6 +23,7 @@ class LessonModelSerializer(serializers.ModelSerializer):
         
 class CourseModelSerializer(serializers.ModelSerializer):
     lesson_course=LessonModelSerializer(many=True,read_only=True)
+    enrolled_course=EnrollmentModelSerializer(many=True,read_only=True)
     
     class Meta:
         model=CourseModel
