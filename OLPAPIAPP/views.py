@@ -135,4 +135,50 @@ class Get_All_Lesson_Via_Course(APIView):
         return Response(ser.data)
     
     
+class ProgressModelView(APIView):
+    def post(self,request):
+        print(f'Before printing the progess--{request.data}')
+        progress=ProgressModelSerializer(data=request.data)
+        print(f'After printing data--{progress.initial_data}')
+       
+        if progress.is_valid():
+            course_id=progress.validated_data['course'].id
+            course=CourseModel.objects.get(id=course_id)
+            Number_of_lessons_in_each_course=int(course.lesson_course.count())
+            progress.validated_data['percentage_completed']=(1/Number_of_lessons_in_each_course)*100
+            progress.save()
+            return Response(progress.data)
+        return Response(progress.errors)  
     
+class ProgressModelDetail(APIView):
+    
+    def get(self,request,progress_id):
+        progress_details=get_object_or_404(ProgressModel,id=progress_id)
+        ser=ProgressModelSerializer(progress_details)
+        return Response(ser.data) 
+       
+    def put(self,request,progress_id):
+        print(progress_id)
+        progress_data=get_object_or_404(ProgressModel,id=progress_id)
+        print(progress_data)
+        ser=ProgressModelSerializer(data=request.data,instance=progress_data)
+        print(ser.initial_data)
+        print(progress_data.is_completed)
+        if progress_data.is_completed==False:
+            if ser.is_valid():
+                print(ser.validated_data)
+                course_id=ser.validated_data['course'].id
+                print(course_id)
+                course=CourseModel.objects.get(id=course_id)
+                print(course)
+                Number_of_lessons_in_each_course=int(course.lesson_course.count())
+                print(Number_of_lessons_in_each_course)
+                print(f'current_lesson-{ser.validated_data['current_lesson'].id}')
+                completed_course=course.lesson_course.filter(id__lte=ser.validated_data['current_lesson'].id).count()
+                print(completed_course)
+                ser.validated_data['percentage_completed']=(completed_course/Number_of_lessons_in_each_course)*100
+                ser.save()
+                return Response(ser.data)
+            return Response(ser.errors)
+        else:
+            return Response('You have completed this module,cheers up!')

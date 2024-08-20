@@ -16,4 +16,6 @@ urlpatterns = [
     path('lessons/create/',LessonDetailCrudView.as_view(),name='lesson-create'),
     path('lessons/<int:lesson_id>/update/',LessonDetailCrudView.as_view(),name='lesson-update'),
     path('lessons/<int:lesson_id>/delete/',LessonDetailCrudView.as_view(),name='lesson-delete'),
+    path('progress/',ProgressModelView.as_view(),name='progress'),
+    path('progress/<int:progress_id>/',ProgressModelDetail.as_view(),name='progress--update'),
 ]

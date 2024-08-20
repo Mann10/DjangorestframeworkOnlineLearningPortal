@@ -47,3 +47,20 @@ class LessonModel(models.Model):
     
     def __str__(self) -> str:
         return f'{self.title}'
+    
+class ProgressModel(models.Model):
+    user=models.ForeignKey(CustomUserModel, on_delete=models.CASCADE,related_name='progess_for_user')
+    course=models.ForeignKey(CourseModel, on_delete=models.CASCADE,related_name='progress_for_course')
+    current_lesson=models.ForeignKey(LessonModel,on_delete=models.CASCADE,related_name='lesson')
+    is_completed=models.BooleanField(default=True)
+    percentage_completed=models.DecimalField(default=0,max_digits=5, decimal_places=2)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'course'], name='user_and_course_unique_together')
+        ]
+                   
+    def save(self,*args, **kwargs):
+        if self.percentage_completed==100.00:
+            self.is_completed=True
+        return super().save(*args, **kwargs)

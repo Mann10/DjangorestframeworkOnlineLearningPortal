@@ -29,5 +29,8 @@ class CourseModelSerializer(serializers.ModelSerializer):
         model=CourseModel
         fields='__all__'
         
-
+class ProgressModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=ProgressModel
+        fields='__all__'
     
