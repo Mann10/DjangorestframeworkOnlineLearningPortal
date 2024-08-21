@@ -64,3 +64,35 @@ class ProgressModel(models.Model):
         if self.percentage_completed==100.00:
             self.is_completed=True
         return super().save(*args, **kwargs)
+    
+    
+class QuizModel(models.Model):
+    title=models.CharField(("Enter the name of the quiz."), max_length=150)
+    course=models.ForeignKey(CourseModel, on_delete=models.CASCADE)
+    description=models.TextField(("Enter the description for your quiz."))
+    
+    def __str__(self) -> str:
+        return f'Name of the quiz is :- {self.title}'
+    
+class QuestionModel(models.Model):
+    quiz=models.ForeignKey(QuizModel, on_delete=models.CASCADE,related_name='questions')
+    text=models.CharField(("Enter your question"), max_length=150)
+    question_type=models.CharField(("What's type of your question"), max_length=50,choices=[('mcq','Normal'),('true/false','TRUE/FALSE'),('msq','multiple-choice')])
+    
+    def __str__(self) -> str:
+        return f'Questions is :- {self.text}'
+    
+class AnswerModel(models.Model):
+    question=models.ForeignKey(QuestionModel, on_delete=models.CASCADE,related_name='question')
+    text=models.CharField(("Enter your options.."), max_length=50)
+    is_correct=models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return f'{self.text} | {self.is_correct}'
+    
+class ResultModel(models.Model):
+    user=models.ForeignKey(CustomUserModel, on_delete=models.CASCADE)
+    quiz=models.ForeignKey(QuizModel, on_delete=models.CASCADE)
+    score=models.IntegerField()
+    passed=models.BooleanField()
+    completed_at=models.DateTimeField(auto_now=False, auto_now_add=False)

@@ -33,4 +33,26 @@ class ProgressModelSerializer(serializers.ModelSerializer):
     class Meta:
         model=ProgressModel
         fields='__all__'
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=AnswerModel
+        fields='__all__' 
+        
+
+class QuestionSerializer(serializers.ModelSerializer):
+    question=AnswerSerializer(read_only=True,many=True)
+    class Meta:
+        model=QuestionModel
+        fields='__all__'       
+        
+class CreateQuizModelSerializer(serializers.ModelSerializer):
+    questions= QuestionSerializer(read_only=True,many=True)
+    question=AnswerSerializer(read_only=True,many=True)
+    class Meta:
+        model=QuizModel
+        fields='__all__'
     
+class ResultModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=ResultModel
+        fields='__all__'

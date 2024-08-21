@@ -18,4 +18,16 @@ urlpatterns = [
     path('lessons/<int:lesson_id>/delete/',LessonDetailCrudView.as_view(),name='lesson-delete'),
     path('progress/',ProgressModelView.as_view(),name='progress'),
     path('progress/<int:progress_id>/',ProgressModelDetail.as_view(),name='progress--update'),
+    path('quiz/create/',CreateQuiz.as_view(),name='quiz-create'),
+    path('quiz/',CreateQuiz.as_view(),name='quiz'),
+    path('quiz/<int:quiz_id>/',QuizDetailView.as_view(),name='quiz'),
+    path('question/',QuestionView.as_view(),name='question'),
+    path('question/create/',QuestionView.as_view(),name='create-question'),
+    path('question/<int:quiz_id>/',QuestionDetailView.as_view(),name='question-id'),
+    path('eachquestionanditsanswer/<int:question_id>/',QuestionAlongAnswerView.as_view(),name='eachquestionalongwithanswer'),
+    path('answer/create/',AnswerView.as_view(),name='create-answer'),
+    path('answer/<int:question_id>/',AnswerDetailView.as_view(),name='answer'),
+    path('quiz/<int:quiz_id>/submit/',SubmitQuizView.as_view(),name='quiz-submit'),
+    path('user/<int:user_id>/results/',QuizResultView.as_view(),name='result'),
+    
 ]
